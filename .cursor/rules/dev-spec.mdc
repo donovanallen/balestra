@@ -1,0 +1,539 @@
+---
+alwaysApply: true
+---
+# Fencing App Development Specification v1.0
+
+## Project Overview
+Personal fencing performance tracking web application with mobile-first responsive design. Built with Next.js 14, TypeScript, and local-first data storage for immediate use and future PWA conversion.
+
+## Tech Stack
+
+### Core Framework
+- **Next.js 15.1+** - Latest App Router, React Server Components, Turbopack
+- **TypeScript 5.7+** - Strict mode enabled
+- **React 19** - New compiler, improved concurrent features
+
+### Styling & UI
+- **Tailwind CSS 3.4+** - Utility-first styling
+- **shadcn/ui** - High-quality, accessible components
+- **Lucide React** - Consistent icon library
+- **clsx** - Conditional class utility
+
+### Data Management
+- **Dexie.js 4.0+** - Powerful IndexedDB wrapper with TypeScript support
+- **Zod 3.24+** - Schema validation and type inference
+- **TanStack Query v5** - Data fetching, caching, synchronization
+- **Zustand 5.0+** - Lightweight state management
+
+**Why Dexie?** Dexie is a mature IndexedDB library that provides:
+- **Local-first storage**: All your data stays in the browser (no server required)
+- **SQL-like querying**: Rich query capabilities with indexes and compound queries
+- **TypeScript integration**: Full type safety for database operations
+- **Offline-ready**: Works perfectly without internet connection
+- **Large storage**: Can handle MBs of data (much more than localStorage)
+- **Future PWA compatibility**: Essential for offline mobile apps
+
+### Forms & Validation
+- **React Hook Form 7.5+** - Performant forms with minimal re-renders
+- **@hookform/resolvers** - Zod integration for validation
+
+### Utilities
+- **date-fns 3.0+** - Date manipulation and formatting
+- **recharts 2.8+** - Charts and data visualization
+- **cmdk** - Command palette component
+
+## Prerequisites
+
+### Development Environment
+- **Node.js 20.10+** (LTS)
+- **pnpm 8.15+** (preferred package manager)
+- **VS Code** with extensions:
+  - TypeScript Importer
+  - Tailwind CSS IntelliSense
+  - Prettier - Code formatter
+  - ES7+ React/Redux/React-Native snippets
+
+### Required Tools
+- **Git** for version control
+- **Chrome DevTools** for debugging and PWA testing
+- **React Developer Tools** browser extension
+
+## Project Structure
+
+```
+fencing-tracker/
+├── src/
+│   ├── app/                    # Next.js 14 App Router
+│   │   ├── globals.css
+│   │   ├── layout.tsx
+│   │   ├── page.tsx
+│   │   ├── bouts/
+│   │   ├── equipment/
+│   │   ├── calendar/
+│   │   └── stats/
+│   ├── components/
+│   │   ├── ui/                 # shadcn/ui components
+│   │   ├── forms/              # Form components
+│   │   ├── layout/             # Layout components
+│   │   └── features/           # Feature-specific components
+│   ├── lib/
+│   │   ├── db/                 # Dexie database setup
+│   │   ├── validations/        # Zod schemas
+│   │   ├── utils.ts            # Utility functions
+│   │   └── constants.ts
+│   ├── hooks/                  # Custom React hooks
+│   ├── stores/                 # Zustand stores
+│   └── types/                  # TypeScript type definitions
+├── public/
+├── package.json
+├── tailwind.config.js
+├── tsconfig.json
+└── next.config.js
+```
+
+## Data Models
+
+### Core Entities (TypeScript Interfaces)
+
+```typescript
+// src/types/index.ts
+
+export interface Profile {
+  id: string;
+  name: string;
+  weaponPrimary: Weapon;
+  division?: string;
+  club?: string;
+  coach?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface Bout {
+  id: string;
+  opponentName: string;
+  date: Date;
+  tournamentName?: string;
+  weapon: Weapon;
+  userScore: number;
+  opponentScore: number;
+  won: boolean;
+  notes?: string;
+  location?: string;
+  type: BoutType;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface Equipment {
+  id: string;
+  type: EquipmentType;
+  subtype?: string;
+  brand?: string;
+  model?: string;
+  purchaseDate?: Date;
+  cost?: number;
+  status: EquipmentStatus;
+  notes?: string;
+  maintenanceReminders: MaintenanceReminder[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface Event {
+  id: string;
+  title: string;
+  date: Date;
+  endDate?: Date;
+  type: EventType;
+  location?: string;
+  notes?: string;
+  exported: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface MaintenanceReminder {
+  id: string;
+  equipmentId: string;
+  type: string;
+  description: string;
+  dueDate: Date;
+  completed: boolean;
+}
+
+// Enums
+export type Weapon = 'foil' | 'epee' | 'sabre';
+export type BoutType = 'practice' | 'lesson' | 'tournament' | 'open-bouting';
+export type EquipmentType = 'weapon' | 'mask' | 'jacket' | 'glove' | 'knickers' | 'plastron' | 'cord' | 'other';
+export type EquipmentStatus = 'active' | 'repair' | 'retired';
+export type EventType = 'practice' | 'lesson' | 'tournament' | 'open-bouting' | 'other';
+```
+
+## Database Setup
+
+### Dexie Configuration
+
+```typescript
+// src/lib/db/schema.ts
+import Dexie, { type EntityTable } from 'dexie';
+import type { Profile, Bout, Equipment, Event } from '@/types';
+
+const db = new Dexie('FencingTrackerDB') as Dexie & {
+  profiles: EntityTable<Profile, 'id'>;
+  bouts: EntityTable<Bout, 'id'>;
+  equipment: EntityTable<Equipment, 'id'>;
+  events: EntityTable<Event, 'id'>;
+};
+
+// Define database schema with indexes for efficient querying
+db.version(1).stores({
+  profiles: '++id, name, weaponPrimary, createdAt',
+  bouts: '++id, opponentName, date, weapon, won, tournamentName, type, createdAt',
+  equipment: '++id, type, subtype, brand, status, purchaseDate, createdAt',
+  events: '++id, title, date, type, createdAt'
+});
+
+export { db };
+
+// Example of what Dexie enables:
+// - db.bouts.where('weapon').equals('epee').toArray()
+// - db.bouts.where('date').between(startDate, endDate).toArray()
+// - db.equipment.where('status').equals('repair').count()
+// - Full-text search, compound indexes, and more
+```
+
+## Validation Schemas
+
+### Zod Schemas
+
+```typescript
+// src/lib/validations/schemas.ts
+import { z } from 'zod';
+
+export const weaponSchema = z.enum(['foil', 'epee', 'sabre']);
+export const boutTypeSchema = z.enum(['practice', 'lesson', 'tournament', 'open-bouting']);
+
+export const profileSchema = z.object({
+  name: z.string().min(1, 'Name is required').max(100),
+  weaponPrimary: weaponSchema,
+  division: z.string().optional(),
+  club: z.string().optional(),
+  coach: z.string().optional(),
+});
+
+export const boutSchema = z.object({
+  opponentName: z.string().min(1, 'Opponent name is required').max(100),
+  date: z.date(),
+  tournamentName: z.string().optional(),
+  weapon: weaponSchema,
+  userScore: z.number().min(0).max(50),
+  opponentScore: z.number().min(0).max(50),
+  notes: z.string().max(500).optional(),
+  location: z.string().max(200).optional(),
+  type: boutTypeSchema,
+}).refine(
+  (data) => data.userScore !== data.opponentScore,
+  { message: "Scores cannot be tied", path: ["userScore"] }
+);
+
+export const equipmentSchema = z.object({
+  type: z.enum(['weapon', 'mask', 'jacket', 'glove', 'knickers', 'plastron', 'cord', 'other']),
+  subtype: z.string().optional(),
+  brand: z.string().optional(),
+  model: z.string().optional(),
+  purchaseDate: z.date().optional(),
+  cost: z.number().min(0).optional(),
+  status: z.enum(['active', 'repair', 'retired']),
+  notes: z.string().max(500).optional(),
+});
+
+export const eventSchema = z.object({
+  title: z.string().min(1, 'Title is required').max(100),
+  date: z.date(),
+  endDate: z.date().optional(),
+  type: z.enum(['practice', 'lesson', 'tournament', 'open-bouting', 'other']),
+  location: z.string().max(200).optional(),
+  notes: z.string().max(500).optional(),
+});
+```
+
+## Development Phases
+
+### Phase 1: Project Setup (Week 1)
+
+#### Initial Setup
+
+#### Configuration Files
+
+**tailwind.config.js**
+
+**tsconfig.json** (key additions)
+
+### Phase 2: Core Infrastructure (Week 1-2)
+
+#### Database Setup
+1. Implement Dexie schema and configuration
+2. Create database initialization and migration utilities
+3. Build data access layer with type-safe CRUD operations
+4. Add data seeding for development
+
+#### Layout & Navigation
+1. Create responsive layout with mobile-first navigation
+2. Implement bottom navigation bar for mobile
+3. Add sidebar navigation for desktop
+4. Create loading states and error boundaries
+
+#### State Management
+1. Set up Zustand stores for app state
+2. Configure TanStack Query for data fetching
+3. Create custom hooks for database operations
+
+### Phase 3: Results Tracking (Week 3-4)
+
+#### Bout Management
+1. **Bout Entry Form**
+   - Multi-step form with validation
+   - Opponent autocomplete from previous bouts
+   - Date/time picker with smart defaults
+   - Score input with validation
+   - Notes and location fields
+
+2. **Bout History**
+   - Paginated list with infinite scroll
+   - Search by opponent name, tournament, date range
+   - Filter by weapon, bout type, win/loss
+   - Sort by date, opponent, score difference
+
+3. **Basic Statistics**
+   - Overall win/loss record
+   - Win percentage by weapon
+   - Recent performance (last 10 bouts)
+   - Monthly/yearly summaries
+
+#### Database Operations
+```typescript
+// Example: Bout CRUD operations
+export class BoutService {
+  static async createBout(bout: Omit<Bout, 'id' | 'createdAt' | 'updatedAt'>) {
+    const now = new Date();
+    return await db.bouts.add({
+      ...bout,
+      id: crypto.randomUUID(),
+      won: bout.userScore > bout.opponentScore,
+      createdAt: now,
+      updatedAt: now,
+    });
+  }
+
+  static async getBouts(filters?: BoutFilters) {
+    let query = db.bouts.orderBy('date').reverse();
+    
+    if (filters?.weapon) {
+      query = query.filter(bout => bout.weapon === filters.weapon);
+    }
+    
+    return await query.toArray();
+  }
+}
+```
+
+### Phase 4: Equipment Management (Week 5-6)
+
+#### Equipment Features
+1. **Equipment Inventory**
+   - Add/edit equipment with categories
+   - Photo upload for equipment items
+   - Status tracking (active, repair, retired)
+   - Purchase information tracking
+
+2. **Maintenance System**
+   - Create maintenance reminders
+   - Track maintenance history
+   - Due date notifications
+   - Equipment lifecycle tracking
+
+3. **Equipment Analytics**
+   - Cost tracking and budgeting
+   - Usage correlation with performance
+   - Replacement scheduling
+
+### Phase 5: Calendar & Events (Week 7-8)
+
+#### Event Management
+1. **Event Creation**
+   - Tournament, practice, lesson scheduling
+   - Recurring event support
+   - Location and contact information
+   - Registration deadline tracking
+
+2. **Calendar Views**
+   - List view with filtering
+   - Monthly overview
+   - Upcoming events dashboard
+
+3. **Export Functionality**
+   - .ics file generation
+   - Google Calendar integration prep
+   - Event sharing capabilities
+
+### Phase 6: Statistics & Analytics (Week 9-10)
+
+#### Advanced Statistics
+1. **Performance Analytics**
+   - Win rate trends over time
+   - Performance by opponent type
+   - Tournament vs practice analysis
+   - Weapon-specific insights
+
+2. **Data Visualization**
+   - Charts using Recharts
+   - Performance heatmaps
+   - Progress tracking graphs
+   - Comparative analysis
+
+#### Export & Backup
+1. **Data Export**
+   - CSV export for all data types
+   - JSON backup functionality
+   - Selective data export
+
+2. **Import Capabilities**
+   - CSV import with validation
+   - Data migration tools
+   - Bulk operations
+
+### Phase 7: Polish & Optimization (Week 11-12)
+
+#### Performance Optimization
+1. **Bundle Optimization**
+   - Code splitting and lazy loading
+   - Image optimization
+   - Service worker preparation
+
+2. **Mobile Optimization**
+   - Touch target sizing
+   - Gesture support preparation
+   - Offline state management
+
+3. **Testing & QA**
+   - Component testing setup
+   - Integration testing
+   - Browser compatibility testing
+
+## Key Implementation Details
+
+### Form Handling Pattern
+```typescript
+// Example form component structure
+export function BoutForm() {
+  const form = useForm<BoutFormData>({
+    resolver: zodResolver(boutSchema),
+    defaultValues: {
+      date: new Date(),
+      weapon: 'epee',
+      type: 'practice',
+    },
+  });
+
+  const { mutate: createBout, isPending } = useMutation({
+    mutationFn: BoutService.createBout,
+    onSuccess: () => {
+      toast.success('Bout recorded successfully');
+      form.reset();
+    },
+  });
+
+  return (
+    <Form {...form}>
+      {/* Form fields */}
+    </Form>
+  );
+}
+```
+
+### Data Fetching Pattern
+```typescript
+// Custom hook for bout data
+export function useBouts(filters?: BoutFilters) {
+  return useQuery({
+    queryKey: ['bouts', filters],
+    queryFn: () => BoutService.getBouts(filters),
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+}
+```
+
+### Mobile-First Responsive Design
+- Use Tailwind's mobile-first breakpoints
+- Touch targets minimum 44px
+- Readable text sizes (16px base minimum)
+- Adequate contrast ratios
+- Smooth animations and transitions
+
+## Deployment & Hosting
+
+### Vercel Deployment (Recommended)
+1. Connect GitHub repository to Vercel
+2. Configure environment variables
+3. Enable Vercel Analytics
+4. Set up automatic deployments
+
+### Alternative: Netlify
+1. Build command: `pnpm build`
+2. Publish directory: `.next`
+3. Configure redirects for SPA routing
+
+## Development Best Practices
+
+### Code Organization
+- Feature-based folder structure
+- Custom hooks for business logic
+- Separate data access layer
+- Type-safe API boundaries
+
+### Performance Guidelines
+- Use React.memo for expensive components
+- Implement proper key props for lists
+- Lazy load routes and heavy components
+- Optimize images and assets
+
+### Accessibility
+- Semantic HTML structure
+- ARIA labels and descriptions
+- Keyboard navigation support
+- Screen reader compatibility
+
+## Success Metrics for v1.0
+
+### Technical Metrics
+- Lighthouse score > 90 (Performance, Accessibility, SEO)
+- First Contentful Paint < 1.5s
+- Bundle size < 500KB gzipped
+- Zero TypeScript errors
+- 100% form validation coverage
+
+### User Experience Metrics
+- Form completion rate > 95%
+- Data export/import success rate 100%
+- Mobile usability score > 95
+- Cross-browser compatibility (Chrome, Safari, Firefox, Edge)
+
+## Next Steps After v1.0
+
+1. **PWA Conversion** - Add service worker and offline capabilities
+2. **Real-time Scoring** - Implement touch-optimized live scoring interface
+3. **Enhanced Mobile UX** - Native-like gestures and interactions
+4. **External Integrations** - Calendar and tournament database connections
+
+## Troubleshooting Common Issues
+
+### Development Issues
+- **Dexie TypeScript errors**: Ensure proper type definitions and schema alignment
+- **Form validation issues**: Check Zod schema matches TypeScript interfaces
+- **Mobile layout problems**: Test on actual devices, not just browser dev tools
+
+### Performance Issues
+- **Slow IndexedDB queries**: Add proper indexes to Dexie schema
+- **Large bundle size**: Analyze with `@next/bundle-analyzer`
+- **Memory leaks**: Use React DevTools Profiler to identify issues
