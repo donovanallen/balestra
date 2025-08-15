@@ -17,7 +17,6 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select';
-import { ThemeToggle } from '@/components/theme-toggle';
 
 export const metadata: Metadata = {
 	title: 'Style Guide',
@@ -48,7 +47,6 @@ export default function StyleGuidePage() {
 						Tailwind theme tokens, typography, spacing, and UI components.
 					</p>
 				</div>
-				<ThemeToggle />
 			</div>
 
 			<section className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
