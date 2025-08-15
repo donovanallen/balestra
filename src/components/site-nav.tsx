@@ -34,43 +34,67 @@ function DesktopNavLinks() {
 								'hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground rounded-sm px-3 py-2 text-sm transition-colors'
 							}
 						>
-							Home
+							Dashboard
 						</Link>
 					</NavigationMenuLink>
 				</NavigationMenuItem>
 				<NavigationMenuItem>
 					<NavigationMenuLink asChild>
 						<Link
-							href="/style"
+							href="/results"
 							className={
 								'hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground rounded-sm px-3 py-2 text-sm transition-colors'
 							}
 						>
-							Style Guide
+							Results
 						</Link>
 					</NavigationMenuLink>
 				</NavigationMenuItem>
 				<NavigationMenuItem>
 					<NavigationMenuLink asChild>
 						<Link
-							href="/about"
+							href="/armory"
 							className={
 								'hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground rounded-sm px-3 py-2 text-sm transition-colors'
 							}
 						>
-							About
+							Armory
 						</Link>
 					</NavigationMenuLink>
 				</NavigationMenuItem>
 				<NavigationMenuItem>
 					<NavigationMenuLink asChild>
 						<Link
-							href="/contact"
+							href="/calendar"
 							className={
 								'hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground rounded-sm px-3 py-2 text-sm transition-colors'
 							}
 						>
-							Contact
+							Calendar
+						</Link>
+					</NavigationMenuLink>
+				</NavigationMenuItem>
+				<NavigationMenuItem>
+					<NavigationMenuLink asChild>
+						<Link
+							href="/stats"
+							className={
+								'hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground rounded-sm px-3 py-2 text-sm transition-colors'
+							}
+						>
+							Statistics
+						</Link>
+					</NavigationMenuLink>
+				</NavigationMenuItem>
+				<NavigationMenuItem>
+					<NavigationMenuLink asChild>
+						<Link
+							href="/profile"
+							className={
+								'hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground rounded-sm px-3 py-2 text-sm transition-colors'
+							}
+						>
+							Profile
 						</Link>
 					</NavigationMenuLink>
 				</NavigationMenuItem>
@@ -102,25 +126,43 @@ function MobileNav() {
 							href="/"
 							className="hover:bg-accent text-sm rounded-md px-3 py-2 transition-colors"
 						>
-							Home
+							Dashboard
 						</Link>
 						<Link
-							href="/style"
+							href="/results"
 							className="hover:bg-accent text-sm rounded-md px-3 py-2 transition-colors"
 						>
-							Style Guide
+							Results
 						</Link>
 						<Link
-							href="/about"
+							href="/armory"
 							className="hover:bg-accent text-sm rounded-md px-3 py-2 transition-colors"
 						>
-							About
+							Armory
 						</Link>
 						<Link
-							href="/contact"
+							href="/calendar"
 							className="hover:bg-accent text-sm rounded-md px-3 py-2 transition-colors"
 						>
-							Contact
+							Calendar
+						</Link>
+						<Link
+							href="/stats"
+							className="hover:bg-accent text-sm rounded-md px-3 py-2 transition-colors"
+						>
+							Statistics
+						</Link>
+						<Link
+							href="/profile"
+							className="hover:bg-accent text-sm rounded-md px-3 py-2 transition-colors"
+						>
+							Profile
+						</Link>
+						<Link
+							href="/settings"
+							className="hover:bg-accent text-sm rounded-md px-3 py-2 transition-colors"
+						>
+							Settings
 						</Link>
 					</nav>
 					<SheetFooter className="border-t">
