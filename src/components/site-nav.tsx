@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { Menu, Settings, User } from 'lucide-react';
+import { Menu, Settings, User, Shield } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -74,6 +74,18 @@ function DesktopNavLinks() {
 						</Link>
 					</NavigationMenuLink>
 				</NavigationMenuItem>
+				<NavigationMenuItem>
+					<NavigationMenuLink asChild>
+						<Link
+							href="/admin"
+							className={
+								'hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground rounded-sm px-3 py-2 text-sm transition-colors'
+							}
+						>
+							Admin
+						</Link>
+					</NavigationMenuLink>
+				</NavigationMenuItem>
 			</NavigationMenuList>
 		</NavigationMenu>
 	);
@@ -140,6 +152,12 @@ function MobileNav() {
 						>
 							Settings
 						</Link>
+						<Link
+							href="/admin"
+							className="hover:bg-accent text-sm rounded-md px-3 py-2 transition-colors"
+						>
+							Admin
+						</Link>
 					</nav>
 					<SheetFooter className="border-t">
 						<div className="flex w-full items-center justify-between">
@@ -174,20 +192,22 @@ export function SiteNav({ className }: { className?: string }) {
 				<DesktopNavLinks />
 
 				<div className="flex items-center gap-2">
-					<div className="hidden md:flex md:items-center md:gap-6">
-						<div className="flex items-center gap-2">
-							<Link href="/profile">
-								<Button variant="ghost" size="icon">
-									<User className="size-5" />
-								</Button>
-							</Link>
-							<Link href="/settings">
-								<Button variant="ghost" size="icon">
-									<Settings className="size-5" />
-								</Button>
-							</Link>
-						</div>
-						<ThemeToggle />
+					<div className="hidden md:flex md:items-center md:gap-2">
+						<Link href="/profile">
+							<Button variant="ghost" size="icon">
+								<User className="size-5" />
+							</Button>
+						</Link>
+						<Link href="/settings">
+							<Button variant="ghost" size="icon">
+								<Settings className="size-5" />
+							</Button>
+						</Link>
+						<Link href="/admin">
+							<Button variant="ghost" size="icon">
+								<Shield className="size-5" />
+							</Button>
+						</Link>
 					</div>
 					<MobileNav />
 				</div>
