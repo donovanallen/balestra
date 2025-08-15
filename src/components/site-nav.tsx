@@ -29,24 +29,12 @@ function DesktopNavLinks() {
 				<NavigationMenuItem>
 					<NavigationMenuLink asChild>
 						<Link
-							href="/stats"
+							href="/"
 							className={
 								'hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground rounded-sm px-3 py-2 text-sm transition-colors'
 							}
 						>
-							Stats
-						</Link>
-					</NavigationMenuLink>
-				</NavigationMenuItem>
-				<NavigationMenuItem>
-					<NavigationMenuLink asChild>
-						<Link
-							href="/profile"
-							className={
-								'hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground rounded-sm px-3 py-2 text-sm transition-colors'
-							}
-						>
-							Profile
+							Dashboard
 						</Link>
 					</NavigationMenuLink>
 				</NavigationMenuItem>
@@ -89,24 +77,24 @@ function DesktopNavLinks() {
 				<NavigationMenuItem>
 					<NavigationMenuLink asChild>
 						<Link
-							href="/settings"
+							href="/stats"
 							className={
 								'hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground rounded-sm px-3 py-2 text-sm transition-colors'
 							}
 						>
-							Settings
+							Statistics
 						</Link>
 					</NavigationMenuLink>
 				</NavigationMenuItem>
 				<NavigationMenuItem>
 					<NavigationMenuLink asChild>
 						<Link
-							href="/style"
+							href="/profile"
 							className={
 								'hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground rounded-sm px-3 py-2 text-sm transition-colors'
 							}
 						>
-							Style Guide
+							Profile
 						</Link>
 					</NavigationMenuLink>
 				</NavigationMenuItem>
@@ -138,19 +126,7 @@ function MobileNav() {
 							href="/"
 							className="hover:bg-accent text-sm rounded-md px-3 py-2 transition-colors"
 						>
-							Home
-						</Link>
-						<Link
-							href="/stats"
-							className="hover:bg-accent text-sm rounded-md px-3 py-2 transition-colors"
-						>
-							Stats
-						</Link>
-						<Link
-							href="/profile"
-							className="hover:bg-accent text-sm rounded-md px-3 py-2 transition-colors"
-						>
-							Profile
+							Dashboard
 						</Link>
 						<Link
 							href="/results"
@@ -171,16 +147,22 @@ function MobileNav() {
 							Calendar
 						</Link>
 						<Link
+							href="/stats"
+							className="hover:bg-accent text-sm rounded-md px-3 py-2 transition-colors"
+						>
+							Statistics
+						</Link>
+						<Link
+							href="/profile"
+							className="hover:bg-accent text-sm rounded-md px-3 py-2 transition-colors"
+						>
+							Profile
+						</Link>
+						<Link
 							href="/settings"
 							className="hover:bg-accent text-sm rounded-md px-3 py-2 transition-colors"
 						>
 							Settings
-						</Link>
-						<Link
-							href="/style"
-							className="hover:bg-accent text-sm rounded-md px-3 py-2 transition-colors"
-						>
-							Style Guide
 						</Link>
 					</nav>
 					<SheetFooter className="border-t">
