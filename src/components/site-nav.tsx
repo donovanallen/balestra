@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { Menu } from 'lucide-react';
+import { Menu, Settings, User } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -26,18 +26,6 @@ function DesktopNavLinks() {
 	return (
 		<NavigationMenu className="hidden md:flex" viewport={false}>
 			<NavigationMenuList>
-				<NavigationMenuItem>
-					<NavigationMenuLink asChild>
-						<Link
-							href="/"
-							className={
-								'hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground rounded-sm px-3 py-2 text-sm transition-colors'
-							}
-						>
-							Dashboard
-						</Link>
-					</NavigationMenuLink>
-				</NavigationMenuItem>
 				<NavigationMenuItem>
 					<NavigationMenuLink asChild>
 						<Link
@@ -83,18 +71,6 @@ function DesktopNavLinks() {
 							}
 						>
 							Statistics
-						</Link>
-					</NavigationMenuLink>
-				</NavigationMenuItem>
-				<NavigationMenuItem>
-					<NavigationMenuLink asChild>
-						<Link
-							href="/profile"
-							className={
-								'hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground rounded-sm px-3 py-2 text-sm transition-colors'
-							}
-						>
-							Profile
 						</Link>
 					</NavigationMenuLink>
 				</NavigationMenuItem>
@@ -198,7 +174,19 @@ export function SiteNav({ className }: { className?: string }) {
 				<DesktopNavLinks />
 
 				<div className="flex items-center gap-2">
-					<div className="hidden md:block">
+					<div className="hidden md:flex md:items-center md:gap-6">
+						<div className="flex items-center gap-2">
+							<Link href="/profile">
+								<Button variant="ghost" size="icon">
+									<User className="size-5" />
+								</Button>
+							</Link>
+							<Link href="/settings">
+								<Button variant="ghost" size="icon">
+									<Settings className="size-5" />
+								</Button>
+							</Link>
+						</div>
 						<ThemeToggle />
 					</div>
 					<MobileNav />

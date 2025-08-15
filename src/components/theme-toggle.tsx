@@ -36,22 +36,13 @@ export function ThemeToggle() {
 	return (
 		<div className="flex items-center gap-2">
 			<Button
-				aria-label="Switch to light mode"
-				title="Light"
-				variant={isDark ? 'outline' : 'default'}
+				aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode`}
+				title={isDark ? 'Light' : 'Dark'}
+				variant={'outline'}
 				size="icon"
-				onClick={() => setIsDark(false)}
+				onClick={() => setIsDark(!isDark)}
 			>
-				<Sun className="size-4" />
-			</Button>
-			<Button
-				aria-label="Switch to dark mode"
-				title="Dark"
-				variant={isDark ? 'default' : 'outline'}
-				size="icon"
-				onClick={() => setIsDark(true)}
-			>
-				<Moon className="size-4" />
+				{isDark ? <Sun className="size-4" /> : <Moon className="size-4" />}
 			</Button>
 		</div>
 	);
